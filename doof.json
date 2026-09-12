@@ -1,0 +1,24 @@
+{
+  "name": "std/uikit",
+  "version": "0.1.0",
+  "license": "ISC",
+  "build": {
+    "native": {
+      "extraCopyPaths": [
+        "native_uikit.hpp",
+        "native_editor.inc"
+      ],
+      "iosSimulator": {
+        "compilerFlags": ["-fobjc-arc"],
+        "sourceFiles": ["native_uikit.mm"],
+        "frameworks": ["Foundation", "UIKit", "UniformTypeIdentifiers"]
+      },
+      "iosDevice": {
+        "compilerFlags": ["-fobjc-arc"],
+        "sourceFiles": ["native_uikit.mm"],
+        "frameworks": ["Foundation", "UIKit", "UniformTypeIdentifiers"]
+      }
+    }
+  },
+  "dependencies": {}
+}
