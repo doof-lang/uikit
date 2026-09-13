@@ -34,6 +34,28 @@ static UIColor* editorColor(int32_t style) {
 
 @implementation DoofTextView
 - (void)insertText:(NSString*)text {
+    if (self.autoIndent && [text isEqualToString:@"}"]) {
+        NSString* value = self.text ?: @"";
+        NSRange selected = self.selectedRange;
+        if (selected.length == 0 && selected.location != NSNotFound && selected.location <= value.length) {
+            NSRange line = [value lineRangeForRange:NSMakeRange(selected.location, 0)];
+            NSUInteger start = line.location;
+            while (start < selected.location) {
+                unichar character = [value characterAtIndex:start];
+                if (character != ' ' && character != '\t') break;
+                start += 1;
+            }
+            if (start == selected.location && start > line.location) {
+                NSUInteger removed = 0;
+                while (start > line.location && removed < MAX(1, self.indentationWidth)) {
+                    unichar character = [value characterAtIndex:--start];
+                    removed += 1;
+                    if (character == '\t') break;
+                }
+                self.selectedRange = NSMakeRange(start, selected.location - start);
+            }
+        }
+    }
     if (!self.autoIndent || ![text isEqualToString:@"\n"]) { [super insertText:text]; return; }
     NSString* value = self.text ?: @"";
     NSRange selection = self.selectedRange;
@@ -64,9 +86,11 @@ static UIColor* editorColor(int32_t style) {
 @property(nonatomic) doof::callback<void(int32_t, int32_t)> selectionChange;
 @property(nonatomic) BOOL suppress;
 @property(nonatomic) double fontSize;
+@property(nonatomic) doof::callback<std::string(int32_t)> completions;
 @end
 
 @implementation DoofEditorAdapter
+#include "native_completion.inc"
 - (void)textViewDidChange:(UITextView*)textView {
     if (!self.suppress && self.change) {
         doof::detail::ActiveActorScope active(&doof::detail::ApplicationDomain::shared());

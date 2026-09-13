@@ -15,6 +15,7 @@ export class TextEditor implements ViewElement {
     value: string | ((): string) = "",
     onChange: (value: string): none = (value): none => {},
     onSelectionChange: (selection: TextEditorSelection): none = (selection): none => {},
+    completions: (offset: int): string = (offset): string => "",
     fontSize: double = 15.0,
     tabWidth: int = 2,
     autoIndent: bool = true,
@@ -30,6 +31,7 @@ export class TextEditor implements ViewElement {
       initialString(value), fontSize, tabWidth, autoIndent,
       (next): none => { onChange(next); syncUI() },
       (start, length): none => { onSelectionChange(TextEditorSelection { start, length }); syncUI() },
+      completions,
     )
     content := growingControl(native, minHeight)
       .accessibility(accessibilityLabel, accessibilityHint, accessibilityIdentifier)
@@ -40,6 +42,7 @@ export class TextEditor implements ViewElement {
   asView(): View => content
   text(): string => native.textEditorText()
   setText(value: string): none { native.setTextEditorText(value) }
+  complete(): none { native.completeTextEditor() }
 
   selection(): TextEditorSelection => TextEditorSelection {
     start: native.textEditorSelectionStart(),

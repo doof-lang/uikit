@@ -11,6 +11,7 @@ export import class NativeView from "native_uikit.hpp" as doof_uikit::NativeView
     autoIndent: bool,
     change: (value: string): none,
     selectionChange: (start: int, length: int): none,
+    completions: (offset: int): string,
   ): NativeView
   append(child: NativeView): none
   detach(): none
@@ -30,6 +31,7 @@ export import class NativeView from "native_uikit.hpp" as doof_uikit::NativeView
   textEditorSelectionStart(): int
   textEditorSelectionLength(): int
   setTextEditorSelection(start: int, length: int, reveal: bool): none
+  completeTextEditor(): none
 }
 
 export import class NativeScreen from "native_uikit.hpp" as doof_uikit::NativeScreen {

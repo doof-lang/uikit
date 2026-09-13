@@ -6,7 +6,8 @@
     "native": {
       "extraCopyPaths": [
         "native_uikit.hpp",
-        "native_editor.inc"
+        "native_editor.inc",
+        "native_completion.inc"
       ],
       "iosSimulator": {
         "compilerFlags": ["-fobjc-arc"],

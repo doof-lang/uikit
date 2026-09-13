@@ -19,7 +19,8 @@ public:
     static std::shared_ptr<NativeView> textEditor(
         const std::string& value, double fontSize, int32_t tabWidth, bool autoIndent,
         doof::callback<void(std::string)> change,
-        doof::callback<void(int32_t, int32_t)> selectionChange);
+        doof::callback<void(int32_t, int32_t)> selectionChange,
+        doof::callback<std::string(int32_t)> completions);
     ~NativeView();
     void append(std::shared_ptr<NativeView> child);
     void detach();
@@ -42,6 +43,7 @@ public:
     int32_t textEditorSelectionStart();
     int32_t textEditorSelectionLength();
     void setTextEditorSelection(int32_t start, int32_t length, bool reveal);
+    void completeTextEditor();
 
 private:
     friend class NativeScreen;

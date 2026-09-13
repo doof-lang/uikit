@@ -52,3 +52,11 @@ rotation, navigation bars, and window sizes change.
 
 The native bridge uses ARC and is available for both iOS simulator and device
 builds. UIKit and Objective-C types remain private to the bridge.
+
+`TextEditor.complete()` opens a touch-accessible suggestion chooser. Its optional
+`completions(offset)` callback receives a UTF-8 byte offset and returns JSON with
+the exact document `source` and `items`. Each item contains `label`, `detail`,
+`text`, UTF-8 `start`/`end`, and additional `edits` (`{start, end, text}`).
+Suggestions are rejected if the document or selection changes while choosing.
+Non-overlapping edits are applied in reverse order through native text input and
+grouped for undo. Return an empty string or an empty list to suppress suggestions.

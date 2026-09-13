@@ -100,7 +100,8 @@ std::shared_ptr<NativeView> NativeView::button(
 std::shared_ptr<NativeView> NativeView::textEditor(
     const std::string& value, double fontSize, int32_t tabWidth, bool autoIndent,
     doof::callback<void(std::string)> change,
-    doof::callback<void(int32_t, int32_t)> selectionChange) {
+    doof::callback<void(int32_t, int32_t)> selectionChange,
+    doof::callback<std::string(int32_t)> completions) {
     auto result = std::shared_ptr<NativeView>(new NativeView());
     onMain(^{
         DoofTextView* view = [DoofTextView new];
@@ -114,6 +115,7 @@ std::shared_ptr<NativeView> NativeView::textEditor(
         view.autoIndent = autoIndent; view.indentationWidth = tabWidth;
         DoofEditorAdapter* adapter = [DoofEditorAdapter new]; adapter.view = view;
         adapter.change = std::move(change); adapter.selectionChange = std::move(selectionChange); adapter.fontSize = fontSize;
+        adapter.completions = std::move(completions);
         view.delegate = adapter; result->impl_->view = view; result->impl_->adapter = adapter;
     });
     return result;
@@ -124,6 +126,11 @@ void NativeView::append(std::shared_ptr<NativeView> child) {
     auto impl = impl_; auto childImpl = child->impl_;
     onMain(^{ [impl->document ?: impl->view addSubview:childImpl->view]; });
 }
+
+void NativeView::completeTextEditor() {
+    auto impl = impl_;
+    onMain(^{ if (!impl->disposed && impl->adapter) [(DoofEditorAdapter*)impl->adapter complete]; });
+}
 void NativeView::detach() { auto impl = impl_; onMain(^{ [impl->view removeFromSuperview]; }); }
 void NativeView::dispose() {
     if (!impl_ || impl_->disposed) return;
@@ -131,7 +138,7 @@ void NativeView::dispose() {
     auto impl = impl_;
     onMain(^{
         if ([impl->adapter isKindOfClass:DoofEditorAdapter.class]) {
-            DoofEditorAdapter* adapter = impl->adapter; adapter.change = {}; adapter.selectionChange = {};
+            DoofEditorAdapter* adapter = impl->adapter; adapter.change = {}; adapter.selectionChange = {}; adapter.completions = {};
         } else if ([impl->adapter isKindOfClass:DoofActionTarget.class]) {
             ((DoofActionTarget*)impl->adapter).action = {};
         }
